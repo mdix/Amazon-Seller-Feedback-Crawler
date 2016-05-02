@@ -2,14 +2,14 @@ const $         = require('jquery')(require('jsdom').jsdom().defaultView);
 const request   = require('request');
 const encoding  = require("encoding");
 
-const NUMBER_OF_FEEDBACK_PAGES = process.argv.slice(2)[0];
-const SHOW_RATINGS_BELOW       = 3;
-var rawFeedbackUrl = process.argv.slice(3)[0];
+var showRatingsBelow = parseInt(process.argv.slice(2)[0]);
+var numberOfFeedbackPages = parseInt(process.argv.slice(3)[0]);
+var rawFeedbackUrl = process.argv.slice(4)[0];
 rawFeedbackUrl = rawFeedbackUrl.split('currentPage')[0] + 'currentPage=%%PAGE%%';
 var currentPage = 1;
 
 const interval = setInterval(() => {
-    if (currentPage >= NUMBER_OF_FEEDBACK_PAGES + 1) {
+    if (currentPage >= numberOfFeedbackPages + 1) {
         clearInterval(interval);
         return false;
     }
@@ -29,7 +29,7 @@ function handleRequest(currentPage) {
         }
 
         $(markup).each((i, e) => {
-            if (parseInt($(e).find('.feedback-num').text()[0]) < 3) {
+            if (parseInt($(e).find('.feedback-num').text()[0]) < showRatingsBelow) {
                 console.log(
                     ($(e).find('.feedback-comment').text()) + $(e).find('.feedback-rater-date').text() + ' (on page #' + currentPage + ')'
                 );
