@@ -4,7 +4,7 @@ const encoding  = require("encoding");
 
 const NUMBER_OF_FEEDBACK_PAGES = 123;
 const SHOW_RATINGS_BELOW       = 3;
-var rawFeedbackUrl = 'http://www.amazon.de/gp/aag/ajax/paginatedFeedback.html?seller=AIKYB26CRDYA1&isAmazonFulfilled=0&isCBA=&marketplaceID=A1PA6795UKMFR9&asin=&ref_=aag_m_fb&&currentPage=12';
+var rawFeedbackUrl = process.argv.slice(2)[0];
 rawFeedbackUrl = rawFeedbackUrl.split('currentPage')[0] + 'currentPage=%%PAGE%%';
 var currentPage = 1;
 
@@ -17,15 +17,19 @@ const interval = setInterval(() => {
     handleRequest(parseInt(currentPage));
 
     currentPage++;
-}, 100);
+}, 200);
 
 function handleRequest(currentPage) {
-    request.get({encoding: null, url: rawFeedbackUrl.replace('%%PAGE%%', currentPage)}, (err, resp, feedbackRows) => {
+    request.get({encoding: null, url: rawFeedbackUrl.replace('%%PAGE%%', currentPage)}, (err, resp, markup) => {
         if (err) return console.log(err);
-        feedbackRows = encoding.convert(feedbackRows, 'UTF-8', 'ISO-8859-15').toString();
+        markup = encoding.convert(markup, 'UTF-8', 'ISO-8859-15').toString();
 
-        $(feedbackRows).each((i, e) => {
-            if (parseInt($(e).find('.feedback-num').text()[0]) < SHOW_RATINGS_BELOW) {
+        if ($(markup).find('title').html('Bot Check')) {
+            return console.log('Caught by Amazons bot check. Quitting.');
+        }
+
+        $(markup).each((i, e) => {
+            if (parseInt($(e).find('.feedback-num').text()[0]) < 3) {
                 console.log(
                     ($(e).find('.feedback-comment').text()) + $(e).find('.feedback-rater-date').text() + ' (on page #' + currentPage + ')'
                 );
