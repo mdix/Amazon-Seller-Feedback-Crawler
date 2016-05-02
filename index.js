@@ -2,9 +2,9 @@ const $         = require('jquery')(require('jsdom').jsdom().defaultView);
 const request   = require('request');
 const encoding  = require("encoding");
 
-const NUMBER_OF_FEEDBACK_PAGES = 123;
+const NUMBER_OF_FEEDBACK_PAGES = process.argv.slice(2)[0];
 const SHOW_RATINGS_BELOW       = 3;
-var rawFeedbackUrl = process.argv.slice(2)[0];
+var rawFeedbackUrl = process.argv.slice(3)[0];
 rawFeedbackUrl = rawFeedbackUrl.split('currentPage')[0] + 'currentPage=%%PAGE%%';
 var currentPage = 1;
 
